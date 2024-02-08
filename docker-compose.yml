@@ -1,0 +1,23 @@
+version: '3.4'
+
+x-web-service: &web-service
+  restart: always
+  build:
+    context: ./
+  volumes:
+    - .:/var/www/html/smart_app/
+
+services:
+  migration:
+    <<: *web-service
+    command: python manage.py migrate --noinput
+    restart: on-failure
+
+  web:
+    <<: *web-service
+    command: python manage.py runserver 0.0.0.0:8000
+    ports:
+      - "8001:8000"
+    depends_on:
+      - migration
+
